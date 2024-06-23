@@ -1,35 +1,31 @@
-use std::io::{BufRead, Read, Write};
-use crate::{Reader, Writer};
+use crate::workflows;
 
-pub fn solve(mut reader: Reader, mut writer: Writer) {
-    let buffer_size = 8 * 1024; //8KB
-    let mut buffer = vec![0; buffer_size];
+pub fn run_with_workflow() {
+    workflows::with_default_continuous_buffer(|data: &[u8]| solve(data))
+}
 
-    loop {
-        let read_bytes = reader.read(&mut buffer).expect("Cannot read input buffer!");
-        if read_bytes == 0 {
-            break;
-        }
-        // business logic
-        let partial_result: Vec<u8> = buffer[..read_bytes]
-            .iter()
-            .map(|&b| {
-                if !b.is_ascii() {
-                    panic!("Input error: The following byte is not a valid ascii character: {b}")
-                }
-                if b as char == 'T' {
-                    'U' as u8
-                } else {
-                    b
-                }
-            })
-            .collect();
+pub fn solve(data: &[u8]) -> Vec<u8> {
+    data.iter()
+        .map(|&b| {
+            workflows::check_ascii(b);
+            if b as char == 'T' {
+                'U' as u8
+            } else {
+                b
+            }
+        })
+        .collect()
+}
 
-        // Write output
-        writer.write_all(&partial_result)
-            .expect("Could not write partial result");
-    };
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    writer.flush()
-        .expect("Error while flushing buffer.");
+    #[test]
+    fn run_example() {
+        let test_data = "GATGGAACTTGACTACGTAAATT".as_bytes();
+        let expected = "GAUGGAACUUGACUACGUAAAUU".as_bytes();
+
+        assert_eq!(solve(test_data), expected);
+    }
 }
