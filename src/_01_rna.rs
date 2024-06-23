@@ -1,11 +1,15 @@
 use crate::workflows;
 
+
+/**
+ * https://rosalind.info/problems/rna
+ */
 pub fn run_with_workflow() {
-    workflows::with_default_continuous_buffer(|data: &[u8]| solve(data))
+    workflows::with_default_continuous_buffer(|buffer: &[u8]| solve(buffer))
 }
 
-pub fn solve(data: &[u8]) -> Vec<u8> {
-    data.iter()
+fn solve(buffer: &[u8]) -> Vec<u8> {
+    buffer.iter()
         .map(|&b| {
             workflows::check_ascii(b);
             if b as char == 'T' {
