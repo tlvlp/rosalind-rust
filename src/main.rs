@@ -1,6 +1,6 @@
-mod _01_rna;
 mod workflows;
+mod _02_revc;
 
 fn main() {
-    _01_rna::run_with_workflow()
+    _02_revc::run_with_workflow()
 }

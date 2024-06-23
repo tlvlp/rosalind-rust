@@ -14,12 +14,9 @@ fn writer() -> BufWriter<File> {
     return BufWriter::new(File::create(RESULT_PATH)
         .expect(format!("Cannot create output file: {RESULT_PATH}!").as_str()));
 }
-pub fn with_default_continuous_buffer(solver: fn(&[u8]) -> Vec<u8>) {
-    with_continuous_buffer(solver, DEFAULT_BUFFER_SIZE)
-}
 
-pub fn with_continuous_buffer(solver: fn(&[u8]) -> Vec<u8>, buffer_size: usize) {
-    let mut buffer = vec![0; buffer_size];
+pub fn with_default_continuous_buffer(solver: fn(&[u8]) -> Vec<u8>) {
+    let mut buffer = vec![0; DEFAULT_BUFFER_SIZE];
     let mut reader = reader();
     let mut writer = writer();
 
@@ -34,6 +31,21 @@ pub fn with_continuous_buffer(solver: fn(&[u8]) -> Vec<u8>, buffer_size: usize) 
             .expect("Could not write partial result");
     };
 
+    writer.flush()
+        .expect("Error while flushing buffer.");
+}
+
+pub fn with_read_all(solver: fn(&[u8]) -> Vec<u8>) {
+    let mut buffer = vec![];
+    let mut writer = writer();
+    
+    let full_size = reader().read_to_end(&mut buffer)
+        .expect("Cannot read input file to String.");
+
+    let result = solver(&buffer[..full_size]);
+
+    writer.write_all(&result)
+        .expect("Could not write partial result");
     writer.flush()
         .expect("Error while flushing buffer.");
 }
