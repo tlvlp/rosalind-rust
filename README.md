@@ -1,5 +1,5 @@
 # Rosalind in Rust
-Playing around with `Rust` with the `bioinformatics` code challenges form https://rosalind.info.
+Playing around with `Rust` using the `bioinformatics` code challenges form https://rosalind.info.
 
 # Structure
 - Solutions can be found in modules starting with `_`, eg. `_01_rna.rs`.
