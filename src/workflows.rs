@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Read, Write};
+use std::io::{BufRead, BufReader, BufWriter, Read, Write};
 
 const INPUT_PATH: &str = "input";
 const RESULT_PATH: &str = "result";
@@ -15,7 +15,8 @@ fn writer() -> BufWriter<File> {
         .expect(format!("Cannot create output file: {RESULT_PATH}!").as_str()));
 }
 
-pub fn with_default_continuous_buffer(solver: fn(&[u8]) -> Vec<u8>) {
+/// Processes the file contents in chunks using a pre-set buffer size.
+pub fn default_continuous_buffer(solver: fn(&[u8]) -> Vec<u8>) {
     let mut buffer = vec![0; DEFAULT_BUFFER_SIZE];
     let mut reader = reader();
     let mut writer = writer();
@@ -35,7 +36,8 @@ pub fn with_default_continuous_buffer(solver: fn(&[u8]) -> Vec<u8>) {
         .expect("Error while flushing buffer.");
 }
 
-pub fn with_read_all(solver: fn(&[u8]) -> Vec<u8>) {
+/// Processes the all the file contents in a single chunk.
+pub fn read_all(solver: fn(&[u8]) -> Vec<u8>) {
     let mut buffer = vec![];
     let mut writer = writer();
     
@@ -46,6 +48,28 @@ pub fn with_read_all(solver: fn(&[u8]) -> Vec<u8>) {
 
     writer.write_all(&result)
         .expect("Could not write partial result");
+    writer.flush()
+        .expect("Error while flushing buffer.");
+}
+
+
+/// Reads all lines in the file and processes them together
+pub fn read_all_lines(solver: fn(Vec<String>) -> String) {
+    let mut line_buffer = String::new();
+    let mut lines: Vec<String> = vec![];
+    let mut reader = reader();
+    let mut writer = writer();
+
+    loop {
+        let read_bytes = reader.read_line(&mut line_buffer)
+            .expect("Cannot read line!");
+        if read_bytes == 0 { break; }
+        lines.push(line_buffer.clone())
+    };
+    let result = solver(lines);
+    writer.write_all(&result.as_bytes())
+        .expect("Could not write result");
+
     writer.flush()
         .expect("Error while flushing buffer.");
 }

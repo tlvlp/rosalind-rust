@@ -4,8 +4,8 @@ use crate::workflows;
 /**
  * https://rosalind.info/problems/revc
  */
-pub fn run_with_workflow() {
-    workflows::with_read_all(|buffer: &[u8]| solve(buffer))
+pub fn run() {
+    workflows::read_all(|buffer: &[u8]| solve(buffer))
 }
 
 fn solve(buffer: &[u8]) -> Vec<u8> {

@@ -4,8 +4,8 @@ use crate::workflows;
 /**
  * https://rosalind.info/problems/rna
  */
-pub fn run_with_workflow() {
-    workflows::with_default_continuous_buffer(|buffer: &[u8]| solve(buffer))
+pub fn run() {
+    workflows::default_continuous_buffer(|buffer: &[u8]| solve(buffer))
 }
 
 fn solve(buffer: &[u8]) -> Vec<u8> {
